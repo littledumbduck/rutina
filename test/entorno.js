@@ -167,6 +167,7 @@ const ACCESS_SECRET = 'secretoprueba7890';
 
 function crearTuyaFalso(reloj) {
   const estado = {
+    host: 'openapi.tuyaeu.com',
     peticiones: [],
     comandos: [],
     tokensEmitidos: 0,
@@ -197,7 +198,10 @@ function crearTuyaFalso(reloj) {
     const h = opciones.headers;
     const metodo = opciones.method.toUpperCase();
     const cuerpo = opciones.payload || '';
-    estado.peticiones.push({ metodo, ruta: u.pathname, query: u.search, cuerpo });
+    estado.peticiones.push({ metodo, host: u.host, ruta: u.pathname, query: u.search, cuerpo });
+
+    // El proyecto solo existe en su centro de datos.
+    if (u.host !== estado.host) return responder({ success: false, code: 1005, msg: 'clientId is invalid' });
 
     // Firma según la documentación de Tuya (implementación independiente).
     const claves = Array.from(u.searchParams.keys()).sort();

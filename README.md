@@ -33,6 +33,7 @@ Hazlo mejor desde un ordenador. Después, la app se usa desde el móvil.
 ### 1. Crea el proyecto en Tuya
 
 1. Entra en **[platform.tuya.com](https://platform.tuya.com)** y crea una cuenta de desarrollador. Es gratis y es distinta de la cuenta de la app, aunque puedes usar el mismo correo.
+   > Si la web sale en chino, busca el selector de idioma arriba a la derecha y elige **English**. En Chrome también puedes usar *Traducir página*, aunque entonces los nombres de los menús no coincidirán con los de esta guía.
 2. Ve a **Cloud → Development → Create Cloud Project**:
    - *Project Name*: `rutina`
    - *Industry*: **Smart Home**
@@ -63,7 +64,7 @@ Hazlo mejor desde un ordenador. Después, la app se usa desde el móvil.
 
 ### 3. Conecta y crea tu primera regla
 
-1. En **Inicio**, pega el *Access ID* y el *Access Secret*, deja la región en **Europa central** y pulsa **Conectar y probar**.
+1. En **Inicio**, pega el *Access ID* y el *Access Secret*, deja la región en **Europa central** y pulsa **Conectar y probar**. Si la región no es la buena, la app prueba sola las demás y guarda la que funcione. Si no consigues las claves, despliega *¿Dónde consigo estas claves?*.
 2. En **Aparatos**, pulsa **Encender** y **Apagar** para comprobar que tus luces responden.
 3. En **Reglas**, pulsa **+ Nueva regla**. Por ejemplo:
    - Evento que contenga: `trabajo`

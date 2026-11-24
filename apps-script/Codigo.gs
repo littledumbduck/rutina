@@ -653,19 +653,31 @@ function apiEstado() {
   };
 }
 
+/**
+ * Guarda las claves de Tuya después de comprobar que funcionan. Si no van con
+ * la región elegida, prueba las demás (por si el proyecto se creó en otra).
+ */
 function apiConectar(accessId, accessSecret, region) {
-  const c = {
-    accessId: String(accessId || '').trim(),
-    accessSecret: String(accessSecret || '').trim(),
-    region: REGIONES_TUYA[region] ? region : 'eu',
-  };
-  if (!c.accessId || !c.accessSecret) throw new Error('Rellena el Access ID y el Access Secret.');
-  CacheService.getScriptCache().remove(claveCacheToken_(c));
-  const dispositivos = listarDispositivos_(c); // si las claves están mal, esto lanza el error
-  guardar_(CLAVES.config, c);
-  guardarNombres_(dispositivos);
-  anotar_(true, 'Conectado con Tuya (' + dispositivos.length + ' dispositivos).');
-  return dispositivos;
+  const base = { accessId: String(accessId || '').trim(), accessSecret: String(accessSecret || '').trim() };
+  if (!base.accessId || !base.accessSecret) throw new Error('Rellena el Access ID y el Access Secret.');
+  const elegida = REGIONES_TUYA[region] ? region : 'eu';
+  const orden = [elegida].concat(Object.keys(REGIONES_TUYA).filter((k) => k !== elegida));
+
+  let primerError = null;
+  for (let i = 0; i < orden.length; i++) {
+    const c = Object.assign({ region: orden[i] }, base);
+    CacheService.getScriptCache().remove(claveCacheToken_(c));
+    try {
+      const dispositivos = listarDispositivos_(c); // si las claves no valen, lanza el error
+      guardar_(CLAVES.config, c);
+      guardarNombres_(dispositivos);
+      anotar_(true, 'Conectado con Tuya (' + REGIONES_TUYA[c.region].nombre + ', ' + dispositivos.length + ' aparatos).');
+      return dispositivos;
+    } catch (e) {
+      primerError = primerError || e; // el error de la región elegida es el más útil
+    }
+  }
+  throw primerError;
 }
 
 function apiDesconectar() {

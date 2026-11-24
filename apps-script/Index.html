@@ -151,6 +151,9 @@
   #toast.error { background: var(--error); color: #fff; }
 
   .cargando { color: var(--texto-2); padding: 40px 0; text-align: center; }
+  details.ayuda-claves { margin-top: 10px; border: 1px solid var(--borde); border-radius: 12px; padding: 10px 12px; background: var(--superficie-2); }
+  details.ayuda-claves summary { cursor: pointer; font-weight: 600; color: var(--acento); }
+  details.ayuda-claves[open] summary { margin-bottom: 4px; }
   .regla-texto b { font-weight: 600; }
   .oculto { display: none !important; }
 </style>
@@ -180,7 +183,16 @@
       <h2>Primer paso</h2>
       <div class="tarjeta relleno">
         <div class="titulo">Conecta tu cuenta de Tuya</div>
-        <p class="sub">Pega las claves de tu proyecto de <b>platform.tuya.com</b> (pestaña <i>Overview</i> del proyecto).</p>
+        <p class="sub">Pega aquí las dos claves de tu proyecto de <b>platform.tuya.com</b>. Solo se guardan en tu cuenta de Google y nunca se vuelven a mostrar.</p>
+        <details class="ayuda-claves">
+          <summary>¿Dónde consigo estas claves?</summary>
+          <ol class="pasos">
+            <li>Entra en <b>platform.tuya.com</b>. Si sale en chino, cambia el idioma a <b>English</b> (arriba a la derecha).</li>
+            <li><b>Cloud → Development → Create Cloud Project</b>. Elige <i>Smart Home</i> en Industry y Development Method, y <i>Central Europe</i> en Data Center.</li>
+            <li>En el proyecto: <b>Devices → Link App Account → Add App Account</b>. Escanea el QR con la app <b>Tuya Smart</b> (pestaña <i>Yo</i>, icono de escanear arriba a la derecha).</li>
+            <li>En la pestaña <b>Overview</b> del proyecto copia el <b>Access ID</b> y el <b>Access Secret</b> y pégalos aquí.</li>
+          </ol>
+        </details>
         <div data-form-claves></div>
       </div>
     </div>
@@ -446,7 +458,8 @@
         '<label>Access Secret / Client Secret</label><input type="password" name="accessSecret" autocomplete="off" spellcheck="false">' +
         '<label>Región del proyecto</label><select name="region">' +
         d.regiones.map((r) => '<option value="' + r.id + '"' + (r.id === d.region ? ' selected' : '') + '>' + esc(r.nombre) + (r.id === 'eu' ? ' (España)' : '') + '</option>').join('') +
-        '</select><div class="botones" style="margin-top:14px"><button type="button" class="primario">Conectar y probar</button></div>';
+        '</select><p class="ayuda">Si no estás seguro, déjala en Europa central: si no funciona, la app prueba sola las demás.</p>' +
+        '<div class="botones" style="margin-top:14px"><button type="button" class="primario">Conectar y probar</button></div>';
       const boton = $('button', cont);
       boton.addEventListener('click', () => conBoton(boton, async () => {
         const lista = await api('apiConectar', $('[name=accessId]', cont).value, $('[name=accessSecret]', cont).value, $('[name=region]', cont).value);

@@ -127,6 +127,22 @@ test('conectar con claves buenas lista los aparatos; con claves malas explica el
   assert.equal(plano(env2.gs.apiEstado()).conectado, false);
 });
 
+test('si la región elegida no es la del proyecto, prueba las demás y guarda la buena', () => {
+  const env = entornoBase();
+  const lista = plano(env.gs.apiConectar(ACCESS_ID, ACCESS_SECRET, 'us'));
+  assert.equal(lista.length, 2);
+  assert.equal(plano(env.gs.apiEstado()).region, 'eu');
+  assert.equal(env.tuya.peticiones[0].host, 'openapi.tuyaus.com', 'primero prueba la elegida');
+
+  // Con un proyecto en América, las peticiones posteriores van a América.
+  const env2 = entornoBase();
+  env2.tuya.host = 'openapi-ueaz.tuyaus.com';
+  env2.gs.apiConectar(ACCESS_ID, ACCESS_SECRET, 'eu');
+  assert.equal(plano(env2.gs.apiEstado()).region, 'us-e');
+  env2.gs.apiProbar('bf01luz', true, null);
+  assert.equal(env2.tuya.peticiones.at(-1).host, 'openapi-ueaz.tuyaus.com');
+});
+
 test('apiEstado nunca devuelve el secreto', () => {
   const env = entornoBase();
   conectar(env);
