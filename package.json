@@ -1,0 +1,12 @@
+{
+  "name": "rutina",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Enciende tus aparatos Tuya Smart según los eventos de tu Google Calendar (Google Apps Script).",
+  "scripts": {
+    "test": "node --test test/pruebas.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

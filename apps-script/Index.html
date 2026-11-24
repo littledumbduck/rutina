@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rutina</title>
+<style>
+  :root {
+    --fondo: #f6f4f0;
+    --superficie: #ffffff;
+    --superficie-2: #f0ece5;
+    --borde: #e3ddd3;
+    --texto: #1f1b16;
+    --texto-2: #6b6359;
+    --acento: #b85f12;
+    --acento-texto: #ffffff;
+    --acento-suave: #fbeedd;
+    --ok: #2f7d4f;
+    --ok-suave: #e3f3e9;
+    --error: #b3261e;
+    --error-suave: #fbe7e5;
+    --sombra: 0 1px 2px rgba(31, 27, 22, .06), 0 4px 16px rgba(31, 27, 22, .05);
+    --radio: 14px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fondo: #15130f;
+      --superficie: #1f1c17;
+      --superficie-2: #2a261f;
+      --borde: #39342b;
+      --texto: #f2ede6;
+      --texto-2: #ada498;
+      --acento: #f0a050;
+      --acento-texto: #1d1307;
+      --acento-suave: #3a2a17;
+      --ok: #6cc78f;
+      --ok-suave: #1d3326;
+      --error: #f2928a;
+      --error-suave: #3d1f1c;
+      --sombra: none;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--fondo);
+    color: var(--texto);
+    font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .contenedor { max-width: 640px; margin: 0 auto; padding: 0 16px 96px; }
+
+  header { padding: 20px 0 8px; display: flex; align-items: center; gap: 12px; }
+  header .marca { flex: 1; min-width: 0; }
+  header h1 { margin: 0; font-size: 26px; letter-spacing: -.02em; }
+  header p { margin: 2px 0 0; color: var(--texto-2); font-size: 14px; }
+
+  nav.pestanas {
+    position: sticky; top: 0; z-index: 5;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+    padding: 8px 0; background: var(--fondo);
+  }
+  nav.pestanas button {
+    border: 0; border-radius: 10px; padding: 9px 4px; font: inherit; font-size: 14px; font-weight: 600;
+    background: transparent; color: var(--texto-2); cursor: pointer;
+  }
+  nav.pestanas button[aria-selected="true"] { background: var(--superficie); color: var(--texto); box-shadow: var(--sombra); }
+
+  section[hidden] { display: none; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--texto-2); margin: 24px 4px 8px; font-weight: 700; }
+  h2 .accion-h2 { float: right; text-transform: none; letter-spacing: 0; }
+
+  .tarjeta { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra); }
+  .tarjeta + .tarjeta { margin-top: 10px; }
+  .relleno { padding: 16px; }
+  .lista > * { padding: 14px 16px; display: flex; gap: 12px; align-items: center; }
+  .lista > * + * { border-top: 1px solid var(--borde); }
+  .vacio { padding: 20px 16px; color: var(--texto-2); text-align: center; }
+  .crece { flex: 1; min-width: 0; }
+  .titulo { font-weight: 600; overflow-wrap: anywhere; }
+  .sub { color: var(--texto-2); font-size: 14px; overflow-wrap: anywhere; }
+  .hora { font-variant-numeric: tabular-nums; font-weight: 700; min-width: 76px; }
+  .icono { font-size: 22px; width: 32px; text-align: center; flex: none; }
+
+  button, .boton {
+    font: inherit; font-weight: 600; border-radius: 10px; border: 1px solid var(--borde);
+    background: var(--superficie); color: var(--texto); padding: 9px 14px; cursor: pointer; min-height: 40px;
+  }
+  button.primario { background: var(--acento); border-color: var(--acento); color: var(--acento-texto); }
+  button.peligro { color: var(--error); }
+  button.enlace { border: 0; background: none; color: var(--acento); padding: 4px 6px; min-height: 0; }
+  button:disabled { opacity: .55; cursor: default; }
+  .botones { display: flex; gap: 8px; flex-wrap: wrap; }
+  .botones.fin { justify-content: flex-end; }
+  .ancho { width: 100%; }
+
+  .pastilla { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--superficie-2); color: var(--texto-2); white-space: nowrap; }
+  .pastilla.ok { background: var(--ok-suave); color: var(--ok); }
+  .pastilla.mal { background: var(--error-suave); color: var(--error); }
+  .punto { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+  label { display: block; font-weight: 600; margin: 14px 0 6px; }
+  label.en-linea { display: flex; align-items: center; gap: 10px; font-weight: 500; margin: 8px 0; }
+  .ayuda { color: var(--texto-2); font-size: 14px; margin: 6px 0 0; }
+  input[type=text], input[type=password], input[type=time], input[type=number], select {
+    width: 100%; font: inherit; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--borde);
+    background: var(--superficie); color: var(--texto); min-height: 44px;
+  }
+  input[type=number] { max-width: 110px; }
+  input[type=checkbox], input[type=radio] { width: 20px; height: 20px; accent-color: var(--acento); flex: none; margin: 0; }
+  input[type=range] { width: 100%; accent-color: var(--acento); }
+  .opcion { border: 1px solid var(--borde); border-radius: 12px; padding: 12px; margin-top: 8px; }
+  .opcion .detalle { margin: 10px 0 0 30px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .segmentado { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--superficie-2); padding: 4px; border-radius: 12px; }
+  .segmentado button { border: 0; background: transparent; color: var(--texto-2); }
+  .segmentado button[aria-pressed="true"] { background: var(--superficie); color: var(--texto); box-shadow: var(--sombra); }
+
+  .interruptor { position: relative; width: 48px; height: 28px; flex: none; }
+  .interruptor input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 1; }
+  .interruptor span { position: absolute; inset: 0; border-radius: 999px; background: var(--borde); transition: background .15s; }
+  .interruptor span::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+  .interruptor input:checked + span { background: var(--acento); }
+  .interruptor input:checked + span::after { transform: translateX(20px); }
+  .interruptor input:focus-visible + span { outline: 2px solid var(--acento); outline-offset: 2px; }
+
+  .aviso { border-radius: 12px; padding: 12px 14px; font-size: 14px; margin-top: 12px; }
+  .aviso.error { background: var(--error-suave); color: var(--error); }
+  .aviso.info { background: var(--acento-suave); color: var(--texto); }
+  ol.pasos { padding-left: 20px; margin: 8px 0 0; color: var(--texto-2); font-size: 14px; }
+  ol.pasos li + li { margin-top: 4px; }
+  code { font-size: .92em; background: var(--superficie-2); padding: 1px 5px; border-radius: 6px; }
+
+  dialog {
+    border: 0; padding: 0; width: 100%; max-width: 640px; max-height: 100dvh; height: 100dvh; margin: 0 auto;
+    background: var(--fondo); color: var(--texto);
+  }
+  @media (min-width: 700px) { dialog { height: auto; max-height: 92dvh; margin-top: 4dvh; border-radius: 18px; } }
+  dialog::backdrop { background: rgba(0,0,0,.4); }
+  .cabecera-dialogo { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: var(--fondo); border-bottom: 1px solid var(--borde); }
+  .cabecera-dialogo h3 { flex: 1; margin: 0; font-size: 18px; }
+  .cuerpo-dialogo { padding: 4px 16px 32px; }
+
+  #toast { position: fixed; left: 16px; right: 16px; bottom: 20px; max-width: 520px; margin: 0 auto; padding: 12px 16px; border-radius: 12px; background: var(--texto); color: var(--fondo); font-weight: 600; box-shadow: 0 6px 24px rgba(0,0,0,.2); transform: translateY(calc(100% + 40px)); visibility: hidden; transition: transform .2s, visibility 0s .2s; z-index: 50; }
+  #toast.visible { transform: none; visibility: visible; transition: transform .2s; }
+  .disp { flex-wrap: wrap; }
+  .disp .botones { flex-basis: 100%; padding-left: 44px; }
+  .disp .botones button { flex: 1; }
+  #toast.error { background: var(--error); color: #fff; }
+
+  .cargando { color: var(--texto-2); padding: 40px 0; text-align: center; }
+  .regla-texto b { font-weight: 600; }
+  .oculto { display: none !important; }
+</style>
+</head>
+<body>
+<div class="contenedor">
+  <header>
+    <div class="marca">
+      <h1>Rutina</h1>
+      <p>Tus luces, según tu calendario</p>
+    </div>
+    <span id="estadoAuto" class="pastilla">…</span>
+  </header>
+
+  <nav class="pestanas" role="tablist">
+    <button role="tab" data-pestana="inicio" aria-selected="true">Inicio</button>
+    <button role="tab" data-pestana="reglas" aria-selected="false">Reglas</button>
+    <button role="tab" data-pestana="dispositivos" aria-selected="false">Aparatos</button>
+    <button role="tab" data-pestana="ajustes" aria-selected="false">Ajustes</button>
+  </nav>
+
+  <div id="cargando" class="cargando">Cargando…</div>
+
+  <!-- INICIO -->
+  <section id="inicio" hidden>
+    <div id="bloqueConectar" class="oculto">
+      <h2>Primer paso</h2>
+      <div class="tarjeta relleno">
+        <div class="titulo">Conecta tu cuenta de Tuya</div>
+        <p class="sub">Pega las claves de tu proyecto de <b>platform.tuya.com</b> (pestaña <i>Overview</i> del proyecto).</p>
+        <div data-form-claves></div>
+      </div>
+    </div>
+
+    <h2>Próximas acciones <button class="enlace accion-h2" id="btnRecalcular">Actualizar</button></h2>
+    <div id="proximas" class="tarjeta lista"></div>
+
+    <h2>Historial</h2>
+    <div id="registro" class="tarjeta lista"></div>
+  </section>
+
+  <!-- REGLAS -->
+  <section id="reglas" hidden>
+    <h2>Tus reglas</h2>
+    <div id="listaReglas" class="tarjeta lista"></div>
+    <div class="botones" style="margin-top:12px">
+      <button class="primario ancho" id="btnNuevaRegla">+ Nueva regla</button>
+    </div>
+  </section>
+
+  <!-- DISPOSITIVOS -->
+  <section id="dispositivos" hidden>
+    <h2>Tus aparatos en Tuya <button class="enlace accion-h2" id="btnRefrescarDisp">Refrescar</button></h2>
+    <div id="listaDisp" class="tarjeta lista"><div class="vacio">Cargando…</div></div>
+    <p class="ayuda" style="margin:10px 4px">Usa <b>Encender</b> y <b>Apagar</b> para comprobar que la app controla cada aparato.</p>
+  </section>
+
+  <!-- AJUSTES -->
+  <section id="ajustes" hidden>
+    <h2>Automatización</h2>
+    <div class="tarjeta lista">
+      <div>
+        <div class="crece">
+          <div class="titulo">Ejecutar reglas automáticamente</div>
+          <div class="sub">Revisa tu calendario y lanza las acciones a su hora, aunque tengas el móvil apagado.</div>
+        </div>
+        <label class="interruptor" aria-label="Automatización"><input type="checkbox" id="chkAuto"><span></span></label>
+      </div>
+      <div>
+        <div class="crece">
+          <div class="titulo">Zona horaria</div>
+          <div class="sub" id="txtZona">—</div>
+        </div>
+      </div>
+    </div>
+
+    <h2>Cuenta de Tuya</h2>
+    <div class="tarjeta relleno">
+      <div id="infoCuenta" class="sub"></div>
+      <div data-form-claves style="margin-top:4px"></div>
+      <div class="botones" style="margin-top:12px"><button class="peligro" id="btnDesconectar">Desconectar</button></div>
+    </div>
+
+    <h2>Si algo deja de funcionar</h2>
+    <div class="tarjeta relleno sub">
+      El plan gratuito de Tuya caduca cada cierto tiempo. Si en el historial ves errores de permisos o de suscripción,
+      entra en <b>platform.tuya.com → Cloud → tu proyecto → Service API</b> y renueva <i>IoT Core</i>.
+    </div>
+  </section>
+</div>
+
+<!-- EDITOR DE REGLAS -->
+<dialog id="dlgRegla">
+  <form method="dialog" id="formRegla" novalidate>
+    <div class="cabecera-dialogo">
+      <button type="button" class="enlace" id="btnCancelarRegla">Cancelar</button>
+      <h3 id="tituloDlg">Nueva regla</h3>
+      <button type="submit" class="primario" id="btnGuardarRegla">Guardar</button>
+    </div>
+    <div class="cuerpo-dialogo">
+      <label for="fPalabras">Si en el calendario hay un evento que contenga…</label>
+      <input type="text" id="fPalabras" placeholder="trabajo, oficina" autocomplete="off">
+      <p class="ayuda">Separa varias palabras con comas. Da igual mayúsculas o tildes.</p>
+
+      <label>En estos calendarios</label>
+      <div id="fCalendarios" class="tarjeta lista"><div class="vacio">Cargando calendarios…</div></div>
+
+      <label>Entonces</label>
+      <div class="segmentado" id="fAccion">
+        <button type="button" data-valor="encender" aria-pressed="true">Encender</button>
+        <button type="button" data-valor="apagar" aria-pressed="false">Apagar</button>
+      </div>
+
+      <label>Estos aparatos</label>
+      <div id="fDispositivos" class="tarjeta lista"><div class="vacio">Cargando aparatos…</div></div>
+
+      <label>¿Cuándo?</label>
+      <div class="opcion">
+        <label class="en-linea"><input type="radio" name="modo" value="fija" checked> A una hora fija, el día del evento</label>
+        <div class="detalle" data-modo="fija"><input type="time" id="fHora" value="07:00" style="max-width:140px"></div>
+      </div>
+      <div class="opcion">
+        <label class="en-linea"><input type="radio" name="modo" value="relativa"> Un rato antes de que empiece</label>
+        <div class="detalle" data-modo="relativa"><input type="number" id="fMinutos" min="0" max="1440" value="30" inputmode="numeric"> minutos antes</div>
+      </div>
+
+      <div id="bloqueEncender">
+        <label>Opciones</label>
+        <div class="opcion">
+          <label class="en-linea"><input type="checkbox" id="fConBrillo"> Ajustar el brillo</label>
+          <div class="detalle" id="detalleBrillo"><input type="range" id="fBrillo" min="1" max="100" value="60"><span id="txtBrillo" class="hora">60 %</span>
+            <p class="ayuda" style="margin:0">Pone la luz en blanco con ese brillo.</p></div>
+        </div>
+        <div class="opcion">
+          <label class="en-linea"><input type="checkbox" id="fConApagar"> Apagar solo después de</label>
+          <div class="detalle" id="detalleApagar"><input type="number" id="fApagar" min="1" max="1440" value="60" inputmode="numeric"> minutos</div>
+        </div>
+      </div>
+
+      <label for="fNombre">Nombre de la regla (opcional)</label>
+      <input type="text" id="fNombre" placeholder="Despertar para trabajar" autocomplete="off">
+
+      <div id="errRegla" class="aviso error oculto"></div>
+
+      <h2>¿Cuándo se activaría?</h2>
+      <div id="vistaPrevia" class="tarjeta lista"><div class="vacio">Pulsa «Comprobar» para verlo con tu calendario real.</div></div>
+      <div class="botones" style="margin-top:10px">
+        <button type="button" id="btnVistaPrevia">Comprobar</button>
+        <button type="button" class="peligro oculto" id="btnBorrarRegla">Borrar regla</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  const estado = { datos: null, dispositivos: null, calendarios: null, editando: null };
+  const $ = (sel, raiz) => (raiz || document).querySelector(sel);
+  const $$ = (sel, raiz) => Array.from((raiz || document).querySelectorAll(sel));
+
+  function api(nombre, ...args) {
+    return new Promise((ok, ko) => {
+      google.script.run
+        .withSuccessHandler(ok)
+        .withFailureHandler((e) => ko(e instanceof Error ? e : new Error(e && e.message ? e.message : String(e))))
+        [nombre](...args);
+    });
+  }
+
+  function esc(t) {
+    return String(t == null ? '' : t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  let temporizadorToast;
+  function avisar(texto, esError) {
+    const t = $('#toast');
+    t.textContent = texto;
+    t.className = 'visible' + (esError ? ' error' : '');
+    clearTimeout(temporizadorToast);
+    temporizadorToast = setTimeout(() => (t.className = ''), esError ? 6000 : 2600);
+  }
+
+  async function conBoton(boton, fn) {
+    const texto = boton.textContent;
+    boton.disabled = true;
+    boton.textContent = '…';
+    try {
+      return await fn();
+    } catch (e) {
+      avisar(e.message, true);
+    } finally {
+      boton.disabled = false;
+      boton.textContent = texto;
+    }
+  }
+
+  // ---------- fechas ----------
+  function fmtDia(ms) {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: estado.datos.zona, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ms));
+  }
+  function fmtHora(ms) {
+    return new Intl.DateTimeFormat('es-ES', { timeZone: estado.datos.zona, hour: '2-digit', minute: '2-digit' }).format(new Date(ms));
+  }
+  function fmtCuando(ms) {
+    const d = fmtDia(ms);
+    if (d === fmtDia(Date.now())) return 'Hoy ' + fmtHora(ms);
+    if (d === fmtDia(Date.now() + 864e5)) return 'Mañana ' + fmtHora(ms);
+    const dia = new Intl.DateTimeFormat('es-ES', { timeZone: estado.datos.zona, weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(ms));
+    return dia + ', ' + fmtHora(ms);
+  }
+
+  // ---------- pestañas ----------
+  function mostrarPestana(id) {
+    $$('nav.pestanas button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.pestana === id)));
+    $$('section').forEach((s) => (s.hidden = s.id !== id));
+    if (id === 'dispositivos') cargarDispositivos(false);
+    try { localStorage.setItem('rutina.pestana', id); } catch (e) {}
+  }
+  $$('nav.pestanas button').forEach((b) => b.addEventListener('click', () => mostrarPestana(b.dataset.pestana)));
+
+  // ---------- pintado ----------
+  function nombreDisp(id) {
+    const d = (estado.dispositivos || []).find((x) => x.id === id);
+    return (d && d.nombre) || estado.datos.nombres[id] || 'Aparato ' + id.slice(-4);
+  }
+
+  function describirRegla(r) {
+    const que = r.accion === 'apagar' ? 'apagar' : 'encender';
+    const quien = r.dispositivos.map(nombreDisp).join(', ');
+    const cuando = r.modo === 'relativa'
+      ? (r.minutosAntes ? r.minutosAntes + ' min antes de que empiece' : 'cuando empiece')
+      : 'a las ' + r.hora + ' ese día';
+    const extras = [];
+    if (r.brillo) extras.push('brillo ' + r.brillo + ' %');
+    if (r.apagarTras) extras.push('se apaga a los ' + r.apagarTras + ' min');
+    return 'Si hay «<b>' + esc(r.palabras) + '</b>» → ' + que + ' <b>' + esc(quien) + '</b> ' + esc(cuando) +
+      (extras.length ? ' · ' + esc(extras.join(' · ')) : '');
+  }
+
+  function pintar() {
+    const d = estado.datos;
+    $('#cargando').classList.add('oculto');
+
+    const auto = $('#estadoAuto');
+    if (!d.conectado) { auto.className = 'pastilla mal'; auto.innerHTML = '<span class="punto"></span>Sin conectar'; }
+    else if (d.automatizacion) { auto.className = 'pastilla ok'; auto.innerHTML = '<span class="punto"></span>Activa'; }
+    else { auto.className = 'pastilla'; auto.innerHTML = '<span class="punto"></span>En pausa'; }
+
+    $('#bloqueConectar').classList.toggle('oculto', d.conectado);
+    $('#chkAuto').checked = d.automatizacion;
+    $('#txtZona').textContent = d.zona + ' (la de tu Google Calendar)';
+    $('#infoCuenta').innerHTML = d.conectado
+      ? 'Conectado con Access ID <code>' + esc(d.accessId) + '</code> · ' + esc((d.regiones.find((r) => r.id === d.region) || {}).nombre || d.region) + '. Puedes cambiar las claves aquí:'
+      : 'Todavía no has conectado tu cuenta.';
+    $('#btnDesconectar').classList.toggle('oculto', !d.conectado);
+    pintarFormClaves();
+
+    // Próximas
+    const prox = d.proximas || [];
+    $('#proximas').innerHTML = prox.length
+      ? prox.map((a) => '<div><div class="hora">' + esc(fmtCuando(a.cuando)) + '</div><div class="crece"><div class="titulo">' +
+          (a.encender ? 'Encender ' : 'Apagar ') + esc(a.dispositivos.map(nombreDisp).join(', ')) + (a.brillo ? ' · ' + a.brillo + ' %' : '') +
+          '</div><div class="sub">Por «' + esc(a.evento) + '»' + (a.nombreRegla ? ' · ' + esc(a.nombreRegla) : '') + '</div></div></div>').join('')
+      : '<div class="vacio">' + (d.reglas.length ? 'No hay nada previsto en las próximas 26 horas.' : 'Crea tu primera regla en la pestaña «Reglas».') + '</div>';
+
+    // Registro
+    $('#registro').innerHTML = d.registro.length
+      ? d.registro.slice(0, 15).map((r) => '<div><div class="icono" aria-hidden="true">' + (r.ok ? '✅' : '⚠️') + '</div><div class="crece"><div class="sub">' +
+          esc(fmtCuando(r.t)) + '</div><div>' + esc(r.texto) + '</div></div></div>').join('')
+      : '<div class="vacio">Aquí verás lo que la app vaya haciendo.</div>';
+
+    // Reglas
+    $('#listaReglas').innerHTML = d.reglas.length
+      ? d.reglas.map((r) => '<div><div class="crece" data-editar="' + esc(r.id) + '" style="cursor:pointer"><div class="titulo">' + esc(r.nombre) +
+          '</div><div class="sub regla-texto">' + describirRegla(r) + '</div></div>' +
+          '<label class="interruptor" aria-label="Activar regla"><input type="checkbox" data-activar="' + esc(r.id) + '"' + (r.activa !== false ? ' checked' : '') + '><span></span></label></div>').join('')
+      : '<div class="vacio">Aún no tienes reglas.<br>Por ejemplo: si hay «trabajo», encender la luz del dormitorio a las 7:00.</div>';
+    $$('[data-editar]').forEach((el) => el.addEventListener('click', () => abrirEditor(d.reglas.find((r) => r.id === el.dataset.editar))));
+    $$('[data-activar]').forEach((el) => el.addEventListener('change', async () => {
+      try { estado.datos = await api('apiActivarRegla', el.dataset.activar, el.checked); pintar(); avisar(el.checked ? 'Regla activada' : 'Regla en pausa'); }
+      catch (e) { el.checked = !el.checked; avisar(e.message, true); }
+    }));
+  }
+
+  function pintarFormClaves() {
+    const d = estado.datos;
+    $$('[data-form-claves]').forEach((cont) => {
+      if (cont.dataset.pintado) return;
+      cont.dataset.pintado = '1';
+      cont.innerHTML =
+        '<label>Access ID / Client ID</label><input type="text" name="accessId" autocomplete="off" spellcheck="false">' +
+        '<label>Access Secret / Client Secret</label><input type="password" name="accessSecret" autocomplete="off" spellcheck="false">' +
+        '<label>Región del proyecto</label><select name="region">' +
+        d.regiones.map((r) => '<option value="' + r.id + '"' + (r.id === d.region ? ' selected' : '') + '>' + esc(r.nombre) + (r.id === 'eu' ? ' (España)' : '') + '</option>').join('') +
+        '</select><div class="botones" style="margin-top:14px"><button type="button" class="primario">Conectar y probar</button></div>';
+      const boton = $('button', cont);
+      boton.addEventListener('click', () => conBoton(boton, async () => {
+        const lista = await api('apiConectar', $('[name=accessId]', cont).value, $('[name=accessSecret]', cont).value, $('[name=region]', cont).value);
+        estado.dispositivos = lista;
+        $('[name=accessSecret]', cont).value = '';
+        estado.datos = await api('apiEstado');
+        pintar();
+        avisar('¡Conectado! ' + lista.length + ' aparato(s) encontrados.');
+        if (!estado.datos.automatizacion) {
+          estado.datos = await api('apiAutomatizacion', true);
+          pintar();
+        }
+      }));
+    });
+  }
+
+  // ---------- dispositivos ----------
+  const ICONOS = { dj: '💡', xdd: '💡', dd: '🌈', fwd: '✨', dc: '✨', tgq: '🎚️', cz: '🔌', pc: '🔌', kg: '🔘', tdq: '🔘' };
+
+  async function cargarDispositivos(forzar) {
+    const caja = $('#listaDisp');
+    if (!estado.datos || !estado.datos.conectado) {
+      caja.innerHTML = '<div class="vacio">Primero conecta tu cuenta de Tuya en «Inicio».</div>';
+      return [];
+    }
+    if (estado.dispositivos && !forzar) { pintarDispositivos(); return estado.dispositivos; }
+    caja.innerHTML = '<div class="vacio">Cargando…</div>';
+    try {
+      estado.dispositivos = await api('apiDispositivos');
+      pintarDispositivos();
+    } catch (e) {
+      caja.innerHTML = '<div class="vacio" style="color:var(--error)">' + esc(e.message) + '</div>';
+    }
+    return estado.dispositivos || [];
+  }
+
+  function pintarDispositivos() {
+    const lista = estado.dispositivos || [];
+    $('#listaDisp').innerHTML = lista.length
+      ? lista.map((d) => '<div class="disp"><div class="icono" aria-hidden="true">' + (ICONOS[d.categoria] || '📟') + '</div><div class="crece"><div class="titulo">' + esc(d.nombre) +
+          '</div><div class="sub">' + (d.online ? 'Conectado' : 'Sin conexión') + (d.encendido === null ? '' : d.encendido ? ' · encendido' : ' · apagado') +
+          (d.producto ? ' · ' + esc(d.producto) : '') + '</div></div><div class="botones"><button data-probar="1" data-id="' + esc(d.id) + '">Encender</button>' +
+          '<button data-probar="0" data-id="' + esc(d.id) + '">Apagar</button></div></div>').join('')
+      : '<div class="vacio">No aparece ningún aparato. Revisa que hayas vinculado la app Tuya Smart al proyecto (Devices → Link App Account).</div>';
+    $$('[data-probar]').forEach((b) => b.addEventListener('click', () => conBoton(b, async () => {
+      await api('apiProbar', b.dataset.id, b.dataset.probar === '1', null);
+      avisar(b.dataset.probar === '1' ? 'Encendido ✨' : 'Apagado');
+    })));
+  }
+
+  // ---------- editor de reglas ----------
+  function accionElegida() { return $('#fAccion [aria-pressed=true]').dataset.valor; }
+  function modoElegido() { return $('input[name=modo]:checked').value; }
+
+  function refrescarEditor() {
+    const encender = accionElegida() === 'encender';
+    $('#bloqueEncender').classList.toggle('oculto', !encender);
+    $$('[data-modo]').forEach((el) => el.classList.toggle('oculto', el.dataset.modo !== modoElegido()));
+    $('#detalleBrillo').classList.toggle('oculto', !$('#fConBrillo').checked);
+    $('#detalleApagar').classList.toggle('oculto', !$('#fConApagar').checked);
+    $('#txtBrillo').textContent = $('#fBrillo').value + ' %';
+  }
+  $$('#fAccion button').forEach((b) => b.addEventListener('click', () => {
+    $$('#fAccion button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    refrescarEditor();
+  }));
+  $$('input[name=modo], #fConBrillo, #fConApagar, #fBrillo').forEach((el) => el.addEventListener('input', refrescarEditor));
+
+  async function abrirEditor(regla) {
+    estado.editando = regla || null;
+    const r = regla || { palabras: '', calendarios: ['principal'], dispositivos: [], accion: 'encender', modo: 'fija', hora: '07:00', minutosAntes: 30, brillo: null, apagarTras: null, nombre: '' };
+    $('#tituloDlg').textContent = regla ? 'Editar regla' : 'Nueva regla';
+    $('#fPalabras').value = r.palabras;
+    $('#fNombre').value = regla ? r.nombre : '';
+    $$('#fAccion button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.valor === r.accion)));
+    $$('input[name=modo]').forEach((x) => (x.checked = x.value === r.modo));
+    $('#fHora').value = r.hora || '07:00';
+    $('#fMinutos').value = r.minutosAntes != null ? r.minutosAntes : 30;
+    $('#fConBrillo').checked = !!r.brillo;
+    $('#fBrillo').value = r.brillo || 60;
+    $('#fConApagar').checked = !!r.apagarTras;
+    $('#fApagar').value = r.apagarTras || 60;
+    $('#btnBorrarRegla').classList.toggle('oculto', !regla);
+    $('#errRegla').classList.add('oculto');
+    $('#vistaPrevia').innerHTML = '<div class="vacio">Pulsa «Comprobar» para verlo con tu calendario real.</div>';
+    refrescarEditor();
+    $('#dlgRegla').showModal();
+
+    // Calendarios
+    const cajaCal = $('#fCalendarios');
+    try {
+      estado.calendarios = estado.calendarios || await api('apiCalendarios');
+      cajaCal.innerHTML = estado.calendarios.map((c) => '<label class="en-linea"><input type="checkbox" name="cal" value="' + esc(c.id) + '"' +
+        (r.calendarios.indexOf(c.id) >= 0 ? ' checked' : '') + '> <span class="crece">' + esc(c.nombre) + (c.principal ? ' <span class="sub">(principal)</span>' : '') + '</span></label>').join('');
+    } catch (e) { cajaCal.innerHTML = '<div class="vacio" style="color:var(--error)">' + esc(e.message) + '</div>'; }
+
+    // Dispositivos
+    const cajaDisp = $('#fDispositivos');
+    const lista = await cargarDispositivos(false);
+    cajaDisp.innerHTML = lista.length
+      ? lista.map((d) => '<label class="en-linea"><input type="checkbox" name="disp" value="' + esc(d.id) + '"' + (r.dispositivos.indexOf(d.id) >= 0 ? ' checked' : '') +
+          '> <span class="icono" aria-hidden="true">' + (ICONOS[d.categoria] || '📟') + '</span><span class="crece">' + esc(d.nombre) + '</span></label>').join('')
+      : '<div class="vacio">' + (estado.datos.conectado ? 'No se encontraron aparatos.' : 'Primero conecta tu cuenta de Tuya.') + '</div>';
+  }
+
+  function leerEditor() {
+    const encender = accionElegida() === 'encender';
+    return {
+      id: estado.editando ? estado.editando.id : undefined,
+      activa: estado.editando ? estado.editando.activa !== false : true,
+      nombre: $('#fNombre').value,
+      palabras: $('#fPalabras').value,
+      calendarios: $$('input[name=cal]:checked').map((x) => x.value),
+      dispositivos: $$('input[name=disp]:checked').map((x) => x.value),
+      accion: encender ? 'encender' : 'apagar',
+      modo: modoElegido(),
+      hora: $('#fHora').value,
+      minutosAntes: $('#fMinutos').value,
+      brillo: encender && $('#fConBrillo').checked ? $('#fBrillo').value : null,
+      apagarTras: encender && $('#fConApagar').checked ? $('#fApagar').value : null,
+    };
+  }
+
+  function mostrarErrorRegla(e) {
+    const caja = $('#errRegla');
+    caja.textContent = e.message;
+    caja.classList.remove('oculto');
+    caja.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  $('#formRegla').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const boton = $('#btnGuardarRegla');
+    boton.disabled = true;
+    try {
+      estado.datos = await api('apiGuardarRegla', leerEditor());
+      $('#dlgRegla').close();
+      pintar();
+      avisar('Regla guardada');
+    } catch (e) { mostrarErrorRegla(e); }
+    finally { boton.disabled = false; }
+  });
+
+  $('#btnCancelarRegla').addEventListener('click', () => $('#dlgRegla').close());
+
+  $('#btnBorrarRegla').addEventListener('click', () => {
+    if (!estado.editando || !confirm('¿Borrar esta regla?')) return;
+    conBoton($('#btnBorrarRegla'), async () => {
+      estado.datos = await api('apiBorrarRegla', estado.editando.id);
+      $('#dlgRegla').close();
+      pintar();
+      avisar('Regla borrada');
+    });
+  });
+
+  $('#btnVistaPrevia').addEventListener('click', () => conBoton($('#btnVistaPrevia'), async () => {
+    $('#errRegla').classList.add('oculto');
+    let acciones;
+    try { acciones = await api('apiVistaPrevia', leerEditor()); }
+    catch (e) { mostrarErrorRegla(e); return; }
+    $('#vistaPrevia').innerHTML = acciones.length
+      ? acciones.map((a) => '<div><div class="hora">' + esc(fmtCuando(a.cuando)) + '</div><div class="crece"><div class="titulo">' + (a.encender ? 'Encender' : 'Apagar') +
+          '</div><div class="sub">Por «' + esc(a.evento) + '»</div></div></div>').join('')
+      : '<div class="vacio">En los próximos 14 días no hay ningún evento con esas palabras.</div>';
+  }));
+
+  $('#btnNuevaRegla').addEventListener('click', () => abrirEditor(null));
+
+  // ---------- ajustes e inicio ----------
+  $('#chkAuto').addEventListener('change', async (ev) => {
+    const activar = ev.target.checked;
+    try { estado.datos = await api('apiAutomatizacion', activar); pintar(); avisar(activar ? 'Automatización activada' : 'Automatización en pausa'); }
+    catch (e) { ev.target.checked = !activar; avisar(e.message, true); }
+  });
+
+  $('#btnDesconectar').addEventListener('click', () => {
+    if (!confirm('¿Quitar las claves de Tuya? Las reglas no se borran.')) return;
+    conBoton($('#btnDesconectar'), async () => {
+      await api('apiDesconectar');
+      estado.dispositivos = null;
+      estado.datos = await api('apiEstado');
+      pintar();
+    });
+  });
+
+  $('#btnRecalcular').addEventListener('click', () => conBoton($('#btnRecalcular'), async () => {
+    estado.datos = await api('apiActualizarPlan');
+    pintar();
+    avisar('Calendario revisado');
+  }));
+  $('#btnRefrescarDisp').addEventListener('click', () => cargarDispositivos(true));
+
+  // ---------- arranque ----------
+  (async function iniciar() {
+    try {
+      estado.datos = await api('apiEstado');
+      pintar();
+      let pestana = 'inicio';
+      try { pestana = localStorage.getItem('rutina.pestana') || 'inicio'; } catch (e) {}
+      mostrarPestana(estado.datos.conectado ? pestana : 'inicio');
+      if (estado.datos.conectado) cargarDispositivos(false).then(pintar);
+    } catch (e) {
+      $('#cargando').innerHTML = '<div class="aviso error">' + esc(e.message) + '</div>';
+    }
+  })();
+</script>
+</body>
+</html>
