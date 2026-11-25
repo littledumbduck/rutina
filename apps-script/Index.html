@@ -183,7 +183,7 @@
       <h2>Primer paso</h2>
       <div class="tarjeta relleno">
         <div class="titulo">Conecta tu cuenta de Tuya</div>
-        <p class="sub">Pega aquí las dos claves de tu proyecto de <b>platform.tuya.com</b>. Solo se guardan en tu cuenta de Google y nunca se vuelven a mostrar.</p>
+        <p class="sub">Pega aquí las dos claves de tu proyecto de <b>platform.tuya.com</b>. Se guardan de forma privada y nunca se vuelven a mostrar.</p>
         <details class="ayuda-claves">
           <summary>¿Dónde consigo estas claves?</summary>
           <ol class="pasos">
@@ -227,7 +227,7 @@
       <div>
         <div class="crece">
           <div class="titulo">Ejecutar reglas automáticamente</div>
-          <div class="sub">Revisa tu calendario y lanza las acciones a su hora, aunque tengas el móvil apagado.</div>
+          <div class="sub">Revisa tu calendario y lanza las acciones a su hora.</div>
         </div>
         <label class="interruptor" aria-label="Automatización"><input type="checkbox" id="chkAuto"><span></span></label>
       </div>
@@ -414,7 +414,7 @@
 
     $('#bloqueConectar').classList.toggle('oculto', d.conectado);
     $('#chkAuto').checked = d.automatizacion;
-    $('#txtZona').textContent = d.zona + ' (la de tu Google Calendar)';
+    $('#txtZona').textContent = d.zona + ' (la de tu calendario)';
     $('#infoCuenta').innerHTML = d.conectado
       ? 'Conectado con Access ID <code>' + esc(d.accessId) + '</code> · ' + esc((d.regiones.find((r) => r.id === d.region) || {}).nombre || d.region) + '. Puedes cambiar las claves aquí:'
       : 'Todavía no has conectado tu cuenta.';

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icono: un sol saliendo sobre fondo ámbar. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#b85f12" android:pathData="M54,0a54,54 0,1 1,0 108a54,54 0,1 1,0 -108z" />
+    <path android:fillColor="#ffe2b8" android:pathData="M30,66a24,24 0,0 1,48 0z" />
+    <path android:fillColor="#ffe2b8" android:pathData="M51,26h6v12h-6z" />
+    <path android:fillColor="#ffe2b8" android:pathData="M24.3,38.5l4.2,-4.2l8.5,8.5l-4.2,4.2z" />
+    <path android:fillColor="#ffe2b8" android:pathData="M83.7,38.5l-4.2,-4.2l-8.5,8.5l4.2,4.2z" />
+    <path android:fillColor="#ffe2b8" android:pathData="M22,70h64v6h-64z" />
+</vector>
