@@ -26,6 +26,24 @@ Google Calendar ──► Rutina (Apps Script, cada minuto) ──► API de Tuy
 
 ---
 
+## 📱 App de Android (APK), la forma más fácil
+
+La APK hace todo dentro del móvil: lee el calendario del teléfono (el de Google Calendar que ya tienes sincronizado), habla con Tuya y programa alarmas para encender las luces a su hora, incluso con el móvil bloqueado. **No hace falta configurar nada en Google.**
+
+1. Descarga `Rutina-1.0.apk` en el móvil y ábrela. Si Android lo pide, permite «instalar apps de origen desconocido» para tu navegador o gestor de archivos.
+2. Abre **Rutina** y dale permiso para **ver tu calendario**.
+3. Sigue el paso 1 de abajo para sacar las claves de Tuya, pégalas en la app y pulsa **Conectar y probar**.
+4. Crea tus reglas.
+
+Consejos:
+- Cuando haya una regla programada verás un icono de alarma ⏰ en la barra de estado: es la alarma que enciende la luz.
+- Si tu móvil cierra apps para ahorrar batería (pasa en Xiaomi, Huawei y Samsung), ve a *Ajustes → Aplicaciones → Rutina → Batería* y elige «Sin restricciones».
+- Para compilarla: `cd android && gradle assembleRelease` (hace falta el SDK de Android).
+
+La versión web con Google Apps Script (abajo) sigue disponible si prefieres que funcione en la nube.
+
+---
+
 ## Instalación (una sola vez, unos 20 minutos)
 
 Hazlo mejor desde un ordenador. Después, la app se usa desde el móvil.
